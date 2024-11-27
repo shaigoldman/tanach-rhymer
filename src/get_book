@@ -1,0 +1,3 @@
+curl --request GET \
+     --url "https://www.sefaria.org/api/v3/texts/$1?return_format=text_only" > $1.json
+

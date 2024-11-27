@@ -49,7 +49,7 @@ class App:
 
     def __init__(self):
         self.layout = self.panel_app()
-        texts = TextCollection("bib", "./resources")
+        texts = TextCollection("bib", "../data")
         lex = Lexicon(texts)
         self.rhymer = Rhymer(lex)
         self.rhymes = []
