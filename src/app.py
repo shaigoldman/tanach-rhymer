@@ -54,11 +54,14 @@ class App:
             value=True, size=20, name="Loading..."
         )
 
-    def create_cards(self, begin, end):
-        return [
+    def create_cards(self, begin, end, add_spinner=False):
+        cards = [
             MyCard(i + 1, word, verses)
             for i, (word, verses) in zip(range(begin, end), self.rhymes[begin:end])
-        ] + [self.spinner]
+        ] 
+        if add_spinner:
+            cards += [self.spinner]
+        return cards
 
     def update_input(self, event):
         """
@@ -68,7 +71,7 @@ class App:
         self.card_holder.objects = [self.spinner]
         self.rhymes = list(self.rhymer.rhymes_verses(self.input.value))
         self.card_holder.title = f"Output: {len(self.rhymes)} Rhymes Found"
-        self.cards_feed.objects = self.create_cards(0, NUM_RHYMES)
+        self.cards_feed.objects = self.create_cards(0, NUM_RHYMES, NUM_RHYMES < len(self.rhymes))
         self.card_holder.objects = [self.cards_feed]
 
     def update_scroll(self, event):
@@ -78,7 +81,8 @@ class App:
         _, end = self.cards_feed.visible_range
         num_cards_curr = len(self.cards_feed)
         if end > num_cards_curr - (NUM_RHYMES / 3):
-            new_cards = self.create_cards(num_cards_curr, num_cards_curr + NUM_RHYMES)
+            new_end = num_cards_curr + NUM_RHYMES
+            new_cards = self.create_cards(num_cards_curr, new_end, new_end < len(self.rhymes))
             self.cards_feed.pop(-1)
             self.cards_feed.extend(new_cards)
 

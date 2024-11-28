@@ -19,8 +19,10 @@ class HebrewC:
 
     @staticmethod
     def strip(text: Hebrew) -> Hebrew:
+        clean_text = text.no_taamim().no_sof_passuk().__str__()
+        to_remove = "[]()"
         return Hebrew(
-            text.no_taamim().no_sof_passuk().__str__().replace("]", "").replace("[", "")
+            "".join(c for c in clean_text if c not in to_remove)
         )
 
     @staticmethod
