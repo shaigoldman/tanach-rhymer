@@ -33,6 +33,14 @@ def MyCard(index: int, title: HebrewC, verses: list[Loc]) -> pn.Column:
 
     return pn.Column(pn.Card(*items, **card_kwargs, collapsed=True,))
 
+def LetterButton(char, on_press, is_nikkud=False):
+    size = "50"
+    if is_nikkud:
+        size = "100"
+    button = pn.widgets.Button(name=char, styles=dict(font_size=f"{size}em"))
+    pn.bind(on_press(char), button, watch=True)
+    return button
+
 
 class App:
 
@@ -97,13 +105,37 @@ class App:
         input = pn.widgets.TextInput(
             name="Text Input", placeholder="Enter a string here..."
         )
-        input.param.watch(self.update_input, "value")
+        input.param.watch(self.update_input, "enter_pressed")
         return input
+    
+    def _letter_button_press(self, char):
+        def on_click (event):
+            self.input.value_input += char
+        return on_click
 
     def panel_app(self) -> pn.Column:
         """ """
 
         self.input = self._create_input()
+        
+        row1_buttons = pn.Row(
+            *[LetterButton(c, self._letter_button_press)
+              for c in "קראטוןםפ"]
+        )
+        row2_buttons = pn.Row(
+            *[LetterButton(c, self._letter_button_press)
+              for c in "שדגכעיחלךף"]
+        )
+        row3_buttons = pn.Row(
+            *[LetterButton(c, self._letter_button_press)
+              for c in "זסבהנמצתץ"]
+        )
+        nikkud_buttons = pn.Row(
+            *[LetterButton(c, self._letter_button_press, True)
+             for c in "ְֱֲֳִֵֶַָֹֻּ"]
+        )
+        go_button = pn.widgets.Button(name="Go!", button_type='primary', styles=dict(font_size="50px"))
+        pn.bind(self.update_input, go_button, watch=True)
 
         self.cards_feed = self._create_feed
 
@@ -116,10 +148,19 @@ class App:
         )
 
         return pn.Column(
-            pn.pane.Markdown("# Home Page"),
-            self.input,
+            pn.pane.Markdown("# תנ״ך - חיפוש חרוזים"),
+            pn.Column(
+                pn.pane.Markdown("## Tanach - Rhyme Search"),
+                pn.pane.Markdown("### Enter the last syllable of a hebrew word to search for rhymes - Be Sure to include Nikkud!"),
+                self.input,
+                pn.pane.Markdown("### Letters:"),
+                row1_buttons,
+                row2_buttons,
+                pn.Row(row3_buttons, go_button),
+                pn.pane.Markdown("### Nikkud:"),
+            ),
+            nikkud_buttons,
             self.card_holder,
-            styles=dict(direction="rtl"),
         )
 
 
