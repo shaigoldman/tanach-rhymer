@@ -126,7 +126,7 @@ class App:
 if __name__ == "__main__":
     pn.serve(
         panels=lambda: App().layout,
-        port=8868,
+        port=5006,
         title="App",
         show=False,
         autoreload=True,
