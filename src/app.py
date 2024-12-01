@@ -142,7 +142,7 @@ class App:
             *[LetterButton(n, self._letter_button_press, True)
              for n in nikkud.NON_CHATAF]
         )
-        nikkud_buttons1 = pn.Row(
+        nikkud_buttons2 = pn.Row(
             *[LetterButton(n, self._letter_button_press, True)
              for n in nikkud.CHATAF]
         )
@@ -161,17 +161,16 @@ class App:
 
         return pn.Column(
             pn.pane.Markdown("# תנ״ך - חיפוש חרוזים"),
-            pn.Column(
-                pn.pane.Markdown("## Tanach - Rhyme Search"),
-                pn.pane.Markdown("### Enter the last syllable of a hebrew word to search for rhymes - Be Sure to include Nikkud!"),
-                self.input,
-                pn.pane.Markdown("### Letters:"),
-                row1_buttons,
-                row2_buttons,
-                pn.Row(row3_buttons, go_button),
-                pn.pane.Markdown("### Nikkud:"),
-            ),
-            nikkud_buttons,
+            pn.pane.Markdown("## Tanach - Rhyme Search"),
+            pn.pane.Markdown("### Enter the last syllable of a hebrew word to search for rhymes - Be Sure to include Nikkud!"),
+            self.input,
+            pn.pane.Markdown("### Letters:"),
+            row1_buttons,
+            row2_buttons,
+            pn.Row(row3_buttons, go_button),
+            pn.pane.Markdown("### Nikkud:"),
+            nikkud_buttons1,
+            nikkud_buttons2,
             self.card_holder,
         )
 
