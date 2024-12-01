@@ -36,7 +36,8 @@ def WordCard(index: int, title: HebrewC, verses: list[Loc]) -> pn.Column:
 def LetterButton(char, on_press, is_nikkud=False):
     
     if is_nikkud:
-        name = f'ב{nikkud.NIKKUD[char]} [{char}]'
+        sample = "א" if char != "DAGESH" else "ב"
+        name = f'{sample}{nikkud.NIKKUD[char]} [{char}]'
         char = nikkud.NIKKUD[char]
     else:
         name = char
