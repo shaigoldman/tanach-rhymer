@@ -9,8 +9,7 @@ def Verse(loc: Loc, text: HebrewC) -> pn.Column:
     return pn.pane.Markdown(f"{text.__str__()} {loc}")
 
 
-def MyCard(index: int, title: HebrewC, verses: list[Loc]) -> pn.Column:
-
+def WordCard(index: int, title: HebrewC, verses: list[Loc]) -> pn.Column:
     verses_items = [
         Verse(*verses[0]),
         *[
@@ -52,11 +51,9 @@ class App:
     spinner: pn.indicators.LoadingSpinner
     rhymes: list[tuple[HebrewC, list[Loc]]]
 
-    def __init__(self):
+    def __init__(self, rhmyer):
         self.layout = self.panel_app()
-        texts = TextCollection("bib", "../data")
-        lex = Lexicon(texts)
-        self.rhymer = Rhymer(lex)
+        self.rhymer = rhmyer 
         self.rhymes = []
         self.spinner = pn.indicators.LoadingSpinner(
             value=True, size=20, name="Loading..."
@@ -64,7 +61,7 @@ class App:
 
     def create_cards(self, begin, end, add_spinner=False):
         cards = [
-            MyCard(i + 1, word, verses)
+            WordCard(i + 1, word, verses)
             for i, (word, verses) in zip(range(begin, end), self.rhymes[begin:end])
         ] 
         if add_spinner:
@@ -75,12 +72,18 @@ class App:
         """
         Update the card with the input value
         """
+        input = self.input.value_input
+        if not input:
+            input = "-"
+        print(f"Begin Update: {input}")
         self.cards_feed = self._create_feed()
         self.card_holder.objects = [self.spinner]
-        self.rhymes = list(self.rhymer.rhymes_verses(self.input.value))
+        self.rhymes = list(self.rhymer.rhymes_verses(input))
+        print(f"Found Rhymes: {input}")
         self.card_holder.title = f"Output: {len(self.rhymes)} Rhymes Found"
         self.cards_feed.objects = self.create_cards(0, NUM_RHYMES, NUM_RHYMES < len(self.rhymes))
         self.card_holder.objects = [self.cards_feed]
+        print(f"Done: {input}")
 
     def update_scroll(self, event):
         if self.cards_feed.visible_range is None:
@@ -165,8 +168,13 @@ class App:
 
 
 if __name__ == "__main__":
+    
+    texts = TextCollection("bib", "../data")
+    lex = Lexicon(texts)
+    rhmyer = Rhymer(lex)
+    
     pn.serve(
-        panels=lambda: App().layout,
+        panels=lambda: App(rhmyer).layout,
         port=8868,
         title="App",
         show=False,
