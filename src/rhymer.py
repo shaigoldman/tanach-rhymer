@@ -21,9 +21,7 @@ class HebrewC:
     def strip(text: Hebrew) -> Hebrew:
         clean_text = text.no_taamim().no_sof_passuk().__str__()
         to_remove = "[]()"
-        return Hebrew(
-            "".join(c for c in clean_text if c not in to_remove)
-        )
+        return Hebrew("".join(c for c in clean_text if c not in to_remove))
 
     @staticmethod
     def remove_dagesh(text: str | Hebrew) -> str:

@@ -33,15 +33,16 @@ def WordCard(index: int, title: HebrewC, verses: list[Loc]) -> pn.Column:
 
     return pn.Column(pn.Card(*items, **card_kwargs, collapsed=True,))
 
+
 def LetterButton(char, on_press, is_nikkud=False):
-    
+
     if is_nikkud:
         sample = "א" if char != "DAGESH" else "ב"
-        name = f'{sample}{nikkud.NIKKUD[char]} [{char}]'
+        name = f"{sample}{nikkud.NIKKUD[char]} [{char}]"
         char = nikkud.NIKKUD[char]
     else:
         name = char
-    
+
     button = pn.widgets.Button(name=name)
     pn.bind(on_press(char), button, watch=True)
     return button
@@ -59,7 +60,7 @@ class App:
 
     def __init__(self, rhmyer):
         self.layout = self.panel_app()
-        self.rhymer = rhmyer 
+        self.rhymer = rhmyer
         self.rhymes = []
         self.spinner = pn.indicators.LoadingSpinner(
             value=True, size=20, name="Loading..."
@@ -69,7 +70,7 @@ class App:
         cards = [
             WordCard(i + 1, word, verses)
             for i, (word, verses) in zip(range(begin, end), self.rhymes[begin:end])
-        ] 
+        ]
         if add_spinner:
             cards += [self.spinner]
         return cards
@@ -87,7 +88,9 @@ class App:
         self.rhymes = list(self.rhymer.rhymes_verses(input))
         print(f"Found Rhymes: {input}")
         self.card_holder.title = f"Output: {len(self.rhymes)} Rhymes Found"
-        self.cards_feed.objects = self.create_cards(0, NUM_RHYMES, NUM_RHYMES < len(self.rhymes))
+        self.cards_feed.objects = self.create_cards(
+            0, NUM_RHYMES, NUM_RHYMES < len(self.rhymes)
+        )
         self.card_holder.objects = [self.cards_feed]
         print(f"Done: {input}")
 
@@ -99,7 +102,9 @@ class App:
         num_cards_curr = len(self.cards_feed)
         if end > num_cards_curr - (NUM_RHYMES / 3):
             new_end = num_cards_curr + NUM_RHYMES
-            new_cards = self.create_cards(num_cards_curr, new_end, new_end < len(self.rhymes))
+            new_cards = self.create_cards(
+                num_cards_curr, new_end, new_end < len(self.rhymes)
+            )
             self.cards_feed.pop(-1)
             self.cards_feed.extend(new_cards)
 
@@ -116,38 +121,40 @@ class App:
         )
         input.param.watch(self.update_input, "enter_pressed")
         return input
-    
+
     def _letter_button_press(self, char):
-        def on_click (event):
+        def on_click(event):
             self.input.value_input += char
+
         return on_click
 
     def panel_app(self) -> pn.Column:
         """ """
 
         self.input = self._create_input()
-        
+
         row1_buttons = pn.Row(
-            *[LetterButton(c, self._letter_button_press)
-              for c in "קראטוןםפ"]
+            *[LetterButton(c, self._letter_button_press) for c in "קראטוןםפ"]
         )
         row2_buttons = pn.Row(
-            *[LetterButton(c, self._letter_button_press)
-              for c in "שׂשׁדגכעיחלךף"]
+            *[LetterButton(c, self._letter_button_press) for c in "דגכעיחלךף"],
+            *[LetterButton(c, self._letter_button_press) for c in ["שׂ", "שׁ"]],
         )
         row3_buttons = pn.Row(
-            *[LetterButton(c, self._letter_button_press)
-              for c in "זסבהנמצתץ"]
+            *[LetterButton(c, self._letter_button_press) for c in "זסבהנמצתץ"]
         )
         nikkud_buttons1 = pn.Row(
-            *[LetterButton(n, self._letter_button_press, True)
-             for n in nikkud.NON_CHATAF]
+            *[
+                LetterButton(n, self._letter_button_press, True)
+                for n in nikkud.NON_CHATAF
+            ]
         )
         nikkud_buttons2 = pn.Row(
-            *[LetterButton(n, self._letter_button_press, True)
-             for n in nikkud.CHATAF]
+            *[LetterButton(n, self._letter_button_press, True) for n in nikkud.CHATAF]
         )
-        go_button = pn.widgets.Button(name="Go!", button_type='primary', styles=dict(font_size="50px"))
+        go_button = pn.widgets.Button(
+            name="Go!", button_type="primary", styles=dict(font_size="50px")
+        )
         pn.bind(self.update_input, go_button, watch=True)
 
         self.cards_feed = self._create_feed
@@ -163,7 +170,9 @@ class App:
         return pn.Column(
             pn.pane.Markdown("# תנ״ך - חיפוש חרוזים"),
             pn.pane.Markdown("## Tanach - Rhyme Search"),
-            pn.pane.Markdown("### Enter the last syllable of a hebrew word to search for rhymes - Be Sure to include Nikkud!"),
+            pn.pane.Markdown(
+                "### Enter the last syllable of a hebrew word to search for rhymes - Be Sure to include Nikkud!"
+            ),
             self.input,
             pn.pane.Markdown("### Letters:"),
             row1_buttons,
@@ -177,11 +186,11 @@ class App:
 
 
 if __name__ == "__main__":
-    
+
     texts = TextCollection("bib", "../data")
     lex = Lexicon(texts)
     rhmyer = Rhymer(lex)
-    
+
     pn.serve(
         panels=lambda: App(rhmyer).layout,
         port=8868,
