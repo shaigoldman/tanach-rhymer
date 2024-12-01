@@ -3,7 +3,7 @@ import panel as pn
 import nikkud
 from rhymer import TextCollection, Lexicon, Rhymer, HebrewC, Loc
 
-NUM_RHYMES = 30
+MAX_LOAD_RHYMES = 30
 
 
 def Verse(loc: Loc, text: HebrewC) -> pn.Column:
@@ -80,6 +80,7 @@ class App:
         Update the card with the input value
         """
         input = self.input.value_input
+        self.input.value_input = ""
         if not input:
             input = "-"
         print(f"Begin Update: {input}")
@@ -89,19 +90,24 @@ class App:
         print(f"Found Rhymes: {input}")
         self.card_holder.title = f"Output: {len(self.rhymes)} Rhymes Found"
         self.cards_feed.objects = self.create_cards(
-            0, NUM_RHYMES, NUM_RHYMES < len(self.rhymes)
+            0, MAX_LOAD_RHYMES, MAX_LOAD_RHYMES < len(self.rhymes)
         )
+        print(f'Objects: {self.cards_feed.objects}')
         self.card_holder.objects = [self.cards_feed]
         print(f"Done: {input}")
+        print(f'Objects: {self.card_holder.objects}')
+        
 
     def update_scroll(self, event):
         if self.cards_feed.visible_range is None:
-            print("none event")
             return
-        _, end = self.cards_feed.visible_range
+        _, visible_end = self.cards_feed.visible_range
         num_cards_curr = len(self.cards_feed)
-        if end > num_cards_curr - (NUM_RHYMES / 3):
-            new_end = num_cards_curr + NUM_RHYMES
+        if num_cards_curr < MAX_LOAD_RHYMES:
+            return
+        threshold = num_cards_curr - (MAX_LOAD_RHYMES / 3)
+        if visible_end > threshold:
+            new_end = num_cards_curr + MAX_LOAD_RHYMES
             new_cards = self.create_cards(
                 num_cards_curr, new_end, new_end < len(self.rhymes)
             )
@@ -193,7 +199,7 @@ if __name__ == "__main__":
 
     pn.serve(
         panels=lambda: App(rhmyer).layout,
-        port=8868,
+        port=5006,
         title="App",
         show=False,
         autoreload=True,
