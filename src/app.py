@@ -1,5 +1,6 @@
 import pandas as pd
 import panel as pn
+import nikkud
 from rhymer import TextCollection, Lexicon, Rhymer, HebrewC, Loc
 
 NUM_RHYMES = 30
@@ -33,10 +34,14 @@ def WordCard(index: int, title: HebrewC, verses: list[Loc]) -> pn.Column:
     return pn.Column(pn.Card(*items, **card_kwargs, collapsed=True,))
 
 def LetterButton(char, on_press, is_nikkud=False):
-    size = "50"
+    
     if is_nikkud:
-        size = "100"
-    button = pn.widgets.Button(name=char, styles=dict(font_size=f"{size}em"))
+        name = f'ב{nikkud.NIKKUD[char]} [{char}]'
+        char = nikkud.NIKKUD[char]
+    else:
+        name = char
+    
+    button = pn.widgets.Button(name=name)
     pn.bind(on_press(char), button, watch=True)
     return button
 
@@ -127,15 +132,19 @@ class App:
         )
         row2_buttons = pn.Row(
             *[LetterButton(c, self._letter_button_press)
-              for c in "שדגכעיחלךף"]
+              for c in "שׂשׁדגכעיחלךף"]
         )
         row3_buttons = pn.Row(
             *[LetterButton(c, self._letter_button_press)
               for c in "זסבהנמצתץ"]
         )
-        nikkud_buttons = pn.Row(
-            *[LetterButton(c, self._letter_button_press, True)
-             for c in "ְֱֲֳִֵֶַָֹֻּ"]
+        nikkud_buttons1 = pn.Row(
+            *[LetterButton(n, self._letter_button_press, True)
+             for n in nikkud.NON_CHATAF]
+        )
+        nikkud_buttons1 = pn.Row(
+            *[LetterButton(n, self._letter_button_press, True)
+             for n in nikkud.CHATAF]
         )
         go_button = pn.widgets.Button(name="Go!", button_type='primary', styles=dict(font_size="50px"))
         pn.bind(self.update_input, go_button, watch=True)
