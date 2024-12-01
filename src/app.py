@@ -3,7 +3,6 @@ import panel as pn
 import nikkud
 from rhymer import TextCollection, Lexicon, Rhymer, HebrewC, Loc
 
-MAX_LOAD_RHYMES = 30
 
 
 def Verse(loc: Loc, text: HebrewC) -> pn.Column:
@@ -38,7 +37,7 @@ def LetterButton(char, on_press, is_nikkud=False):
 
     if is_nikkud:
         sample = "א" if char != "DAGESH" else "ב"
-        name = f"{sample}{nikkud.NIKKUD[char]} [{char}]"
+        name = f"{sample}{nikkud.NIKKUD[char]} [{char.replace('_', ' ')}]"
         char = nikkud.NIKKUD[char]
     else:
         name = char
@@ -65,6 +64,7 @@ class App:
         self.spinner = pn.indicators.LoadingSpinner(
             value=True, size=20, name="Loading..."
         )
+        self.max_load_rhymes = 30
 
     def create_cards(self, begin, end, add_spinner=False):
         cards = [
@@ -90,12 +90,10 @@ class App:
         print(f"Found Rhymes: {input}")
         self.card_holder.title = f"Output: {len(self.rhymes)} Rhymes Found"
         self.cards_feed.objects = self.create_cards(
-            0, MAX_LOAD_RHYMES, MAX_LOAD_RHYMES < len(self.rhymes)
+            0, self.max_load_rhymes, self.max_load_rhymes < len(self.rhymes)
         )
-        print(f'Objects: {self.cards_feed.objects}')
         self.card_holder.objects = [self.cards_feed]
         print(f"Done: {input}")
-        print(f'Objects: {self.card_holder.objects}')
         
 
     def update_scroll(self, event):
@@ -103,11 +101,11 @@ class App:
             return
         _, visible_end = self.cards_feed.visible_range
         num_cards_curr = len(self.cards_feed)
-        if num_cards_curr < MAX_LOAD_RHYMES:
+        if num_cards_curr < self.max_load_rhymes:
             return
-        threshold = num_cards_curr - (MAX_LOAD_RHYMES / 3)
+        threshold = num_cards_curr - (self.max_load_rhymes / 3)
         if visible_end > threshold:
-            new_end = num_cards_curr + MAX_LOAD_RHYMES
+            new_end = num_cards_curr + self.max_load_rhymes
             new_cards = self.create_cards(
                 num_cards_curr, new_end, new_end < len(self.rhymes)
             )
@@ -123,7 +121,7 @@ class App:
 
     def _create_input(self):
         input = pn.widgets.TextInput(
-            name="Text Input", placeholder="Enter a string here..."
+            name="Rhyme Input", placeholder="Enter an end-syllable here..."
         )
         input.param.watch(self.update_input, "enter_pressed")
         return input
@@ -135,8 +133,6 @@ class App:
         return on_click
 
     def panel_app(self) -> pn.Column:
-        """ """
-
         self.input = self._create_input()
 
         row1_buttons = pn.Row(
@@ -156,7 +152,8 @@ class App:
             ]
         )
         nikkud_buttons2 = pn.Row(
-            *[LetterButton(n, self._letter_button_press, True) for n in nikkud.CHATAF]
+            *[LetterButton(n, self._letter_button_press, True) for n in nikkud.CHATAF],
+            *[LetterButton(n, self._letter_button_press, True) for n in nikkud.COMPLEX],
         )
         go_button = pn.widgets.Button(
             name="Go!", button_type="primary", styles=dict(font_size="50px")

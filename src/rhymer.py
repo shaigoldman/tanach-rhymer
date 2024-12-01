@@ -4,6 +4,7 @@ from pathlib import Path
 import re
 import json
 from hebrew import Hebrew
+import nikkud
 
 
 class HebrewC:
@@ -24,7 +25,7 @@ class HebrewC:
         return Hebrew("".join(c for c in clean_text if c not in to_remove))
 
     @staticmethod
-    def remove_dagesh(text: str | Hebrew) -> str:
+    def remove_dagesh(text: str | Hebrew) -> Hebrew:
         if isinstance(text, Hebrew):
             text = text.__str__()
         clean_text = ""
@@ -42,6 +43,12 @@ class HebrewC:
     def endswith(self, ending: str):
         clean_self = self.remove_dagesh(self.text)
         clean_ending = self.remove_dagesh(ending).__str__()
+        
+        for changable, equiv in nikkud.EQUIVALLENCIES.items():
+            changed = Hebrew(self.__str__().replace(changable, equiv))
+            if changed.endswith(clean_ending):
+                return True
+        
         return clean_self.endswith(clean_ending)
 
     def _bolded_word_iter(self, word: str):
