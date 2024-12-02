@@ -4,7 +4,6 @@ import nikkud
 from rhymer import TextCollection, Lexicon, Rhymer, HebrewC, Loc
 
 
-
 def Verse(loc: Loc, text: HebrewC) -> pn.Column:
     return pn.pane.Markdown(f"{text.__str__()} {loc}")
 
@@ -94,7 +93,6 @@ class App:
         )
         self.card_holder.objects = [self.cards_feed]
         print(f"Done: {input}")
-        
 
     def update_scroll(self, event):
         if self.cards_feed.visible_range is None:
@@ -145,13 +143,11 @@ class App:
         row3_buttons = pn.Row(
             *[LetterButton(c, self._letter_button_press) for c in "זסבהנמצתץ"]
         )
-        nikkud_buttons1 = pn.Row(
+        nikkud_buttons = pn.FlexBox(
             *[
                 LetterButton(n, self._letter_button_press, True)
                 for n in nikkud.NON_CHATAF
-            ]
-        )
-        nikkud_buttons2 = pn.Row(
+            ],
             *[LetterButton(n, self._letter_button_press, True) for n in nikkud.CHATAF],
             *[LetterButton(n, self._letter_button_press, True) for n in nikkud.COMPLEX],
         )
@@ -174,16 +170,16 @@ class App:
             pn.pane.Markdown("# תנ״ך - חיפוש חרוזים"),
             pn.pane.Markdown("## Tanach - Rhyme Search"),
             pn.pane.Markdown(
-                "### Enter the last syllable of a hebrew word to search for rhymes - Be Sure to include Nikkud!"
+                "### Enter the last syllable of a hebrew word to search for rhymes!"
             ),
+            pn.pane.Markdown("Be Sure to include Nikkud!"),
             self.input,
             pn.pane.Markdown("### Letters:"),
             row1_buttons,
             row2_buttons,
             pn.Row(row3_buttons, go_button),
             pn.pane.Markdown("### Nikkud:"),
-            nikkud_buttons1,
-            nikkud_buttons2,
+            nikkud_buttons,
             self.card_holder,
         )
 

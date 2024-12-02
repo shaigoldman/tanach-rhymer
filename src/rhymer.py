@@ -43,12 +43,12 @@ class HebrewC:
     def endswith(self, ending: str):
         clean_self = self.remove_dagesh(self.text)
         clean_ending = self.remove_dagesh(ending).__str__()
-        
+
         for changable, equiv in nikkud.EQUIVALLENCIES.items():
             changed = Hebrew(self.__str__().replace(changable, equiv))
             if changed.endswith(clean_ending):
                 return True
-        
+
         return clean_self.endswith(clean_ending)
 
     def _bolded_word_iter(self, word: str):
