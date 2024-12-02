@@ -172,7 +172,7 @@ class App:
             pn.pane.Markdown(
                 "### Enter the last syllable of a hebrew word to search for rhymes!"
             ),
-            pn.pane.Markdown("Be Sure to include Nikkud!"),
+            pn.pane.Markdown("### Be Sure to include Nikkud!"),
             self.input,
             pn.pane.Markdown("### Letters:"),
             row1_buttons,
