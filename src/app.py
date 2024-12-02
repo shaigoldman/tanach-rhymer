@@ -57,13 +57,13 @@ class App:
     rhymes: list[tuple[HebrewC, list[Loc]]]
 
     def __init__(self, rhmyer):
-        self.layout = self.panel_app()
         self.rhymer = rhmyer
         self.rhymes = []
         self.spinner = pn.indicators.LoadingSpinner(
             value=True, size=20, name="Loading..."
         )
         self.max_load_rhymes = 30
+        self.layout = self.panel_app()
 
     def create_cards(self, begin, end, add_spinner=False):
         cards = [
@@ -87,7 +87,7 @@ class App:
         self.card_holder.objects = [self.spinner]
         self.rhymes = list(self.rhymer.rhymes_verses(input))
         print(f"Found Rhymes: {input}")
-        self.card_holder.title = f"Output: {len(self.rhymes)} Rhymes Found"
+        self.card_holder.title = f"Output {input}: {len(self.rhymes)} Rhymes Found"
         self.cards_feed.objects = self.create_cards(
             0, self.max_load_rhymes, self.max_load_rhymes < len(self.rhymes)
         )
@@ -132,6 +132,7 @@ class App:
 
     def panel_app(self) -> pn.Column:
         self.input = self._create_input()
+        self.input.value_input = "פַּז"
 
         row1_buttons = pn.Row(
             *[LetterButton(c, self._letter_button_press) for c in "קראטוןםפ"]
@@ -152,7 +153,7 @@ class App:
             *[LetterButton(n, self._letter_button_press, True) for n in nikkud.COMPLEX],
         )
         go_button = pn.widgets.Button(
-            name="Go!", button_type="primary", styles=dict(font_size="50px")
+            name="Go!", button_type="primary"
         )
         pn.bind(self.update_input, go_button, watch=True)
 
@@ -162,9 +163,11 @@ class App:
             self.cards_feed,
             title="Output",
             collapsible=False,
-            sizing_mode="stretch_width",
+            # sizing_mode="stretch_width",
             styles=dict(margin="10px", text_align="center"),
         )
+        
+        self.update_input(None)
 
         return pn.Column(
             pn.pane.Markdown("# תנ״ך - חיפוש חרוזים"),
